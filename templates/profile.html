@@ -1,0 +1,218 @@
+<html>
+<head>
+	  <meta charset="utf-8">
+  		<meta name="viewport" content="width=device-width, initial-scale=1">
+  		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+      <style>
+      .img_rounded {
+        border-radius: 300px;
+        width: 20%;
+        max-width: 25%;
+        max-height: 70px;
+      }
+      #overall {
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 100px;
+      }
+      #image-src {
+	width:200px; height:200px;
+	}
+      #image_container {
+        float: left;
+        border-radius: 90px;
+        padding-right: 30px;
+      }
+      #nama, #umur, #gender, #kota{
+        float: left;
+      }
+      .btn {max-height: 30px;}
+      #profile_container {
+        float: right;
+        padding-left: 30px;
+        margin-left:30px;
+      }
+      #wrapper {
+        width: 100%;
+        max-width: 700px;
+        clear: both;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+      }
+      #s1, #s2, #s3, #s4, #s5, #s6, #s7, #s8, #s9, #s10 {
+        float:left;
+        border: 0.5px solid black;
+      }
+      #s1, #s2, #s3, #s4, #s5, #s6{
+        background-color: gold;
+      }
+      #edit, #delete, #back {
+        width:100%;
+      }
+      .gone {
+        display:none;
+      }
+	 .green_bar, .red_bar {
+          height: 30px;
+		  display:block;
+        }
+      .green_bar {
+          background-color: #1BF064;
+          float: left;
+          border-bottom-left-radius: 50px;
+          border-top-left-radius: 50px;
+        }
+        .red_bar {
+          background-color: #cc2323;
+          float:right;
+          border-bottom-right-radius: 50px;
+          border-top-right-radius: 50px;
+        }
+        #poll2 {
+          text-align: right;
+          float:right;
+        }
+        #poll1 {
+          float:left;
+        }
+        #poll1, #poll2 {
+          width: 50%;
+        }
+      </style>
+</head>
+<body background="http://www.powerpointstemplate.com/wp-content/uploads/2017/02/gray-ppt-template-powerpoint-backgrounds.jpg">
+
+  <nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Choose Wise</a>
+      {% if session.username %}
+      <span style='font-size:24px'><span class="glyphicon glyphicon-star"></span>Welcome, {{ session.username }}</span>
+      {% endif %}
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{url_for('index')}}">HOME</a></li>
+        <li><a href="{{url_for('profile',id=session.id)}}">PROFILE</a></li>
+        <li><a href="{{url_for('create_question')}}">CREATE QUESTION</a></li>
+        <li><a href="{{url_for('logout')}}">LOGOUT</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid" id="overall">
+  <div>
+    <div id="image_container">
+      <div id="image_container2">
+        <!-- ini link image y ditampilkan -->
+       {% if profile[4] is not none and profile[4] != "" %}       
+       <img id="image-src" src="{{profile[4]}}" class="img-responsive">
+       {% else %}       
+       <img id="image-src" src="http://s3.amazonaws.com/37assets/svn/765-default-avatar.png" class="img-responsive">
+       {% endif %}
+       <!-- ini untuk edit IMG_URL -->
+       <button id="edit_image" class="edimage btn btn-success" style="width:100%">Edit Image</button>
+	   <form method="POST" action="{{url_for('edit_profile_pic',id=session.id)}}">
+       <input type="text" name="imageurl" class="gone edimage form-control" id="postImage" name="postImage" value='{{profile[4]}}' hidden>
+       <input type="submit" id="setuju" class="gone edimage btn btn-success" style="width:100%" value='Save'>
+	   </form>
+       <button id="kembali" class="gone edimage btn btn-danger" style="width:100%">Back</button>
+      </div>
+    </div>
+    <div  id="profile_container">
+      <div id="username_container">
+        <!-- ini nama yg diambil dri database -->
+        <h3 id="username">Username: {{profile[1]}}</h3>
+      </div>
+      <div id="email_container">
+      <!-- umur dri db -->
+        <h3 id="email">Email: {{profile[2]}}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if questions|length < 1 %}
+<h1 class="text-center" style="margin-top:100px;">No Questions yet. To create one, click <a href="{{url_for('create_question')}}">here</a>.</h1>
+{% else %}
+<h1 class="text-center" style="margin-top:100px;">Your Questions:</h1>
+{% for question in questions %}
+ <div class="container" id="choice_result" >
+
+  <h1 class="text-center"><b id="result">{{question[1]}}</b></h1>
+  <div class="row">
+    <div class="col-sm-4">
+      <center>
+	  <div class="container">
+	  {% if question[4] == 0 and question[5] == 0 %}
+	  <h1>No votes yet</h1>
+	  {% else %}
+      <h4 id="first_choice">{{question[2]}} : {{question[4]}} votes ({{(question[4]*100/(question[4]+question[5]))|round|int}}%)</h4>
+      <h4 id="second_choice">{{question[3]}} : {{question[5]}} votes ({{(100-(question[4]*100/(question[4]+question[5])))|round|int}}%)</h4>
+	  
+	  {% endif %}
+	  </div>
+	  
+      </center>
+    </div>
+  </div>
+  <div class="row">
+	<div class="col-sm-3" ></div>
+	<div class="col-sm-6">
+	{% if question[4] == 0 %}
+	<div class="green_bar" style='width:0%'></div>
+	{% else %}
+	<div class="green_bar" style='width:{{(question[4]*100/(question[4]+question[5]))|round|int}}%'></div>
+	{% endif %}
+	{% if question[5] == 0 %}
+	<div class="red_bar" style='width:0%'></div>
+	{% else %}
+	<div class="red_bar" style='width:{{(100-(question[4]*100/(question[4]+question[5])))|round|int}}%'></div>
+	{% endif %}
+	</div>
+	<div class="col-sm-3" ></div>
+  </div>
+</div>
+
+<br><br>
+<div class="container-fluid">
+  <div class="col-sm-5"></div>
+  <div class="col-sm-2">
+    <a href="{{url_for('delete_question',id=question[0])}}" id="delete" class="btn btn-info">Delete</a>
+  </div>
+  <div class="col-sm-5"></div>
+</div>
+
+</div>
+{% endfor %}
+{% endif %}
+<script>
+  $(function(){
+    $("#edit").click(function(){
+      $("#edit").toggle();
+    });
+    $("#edit_image").click(function(){
+      $(".edimage").toggle();
+    });
+    $("#kembali").click(function(){
+      $(".edimage").toggle();
+    });
+    $("#back").click(function(){
+      $(".tog").toggle();
+    });
+  });
+  </script>
+
+</body>
+</html>

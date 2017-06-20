@@ -1,0 +1,157 @@
+<html>
+<head>
+    <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+      <style>
+        #choice, #choice_result {
+          margin-top: 100px;
+        }
+        #pilihan1, #pilihan2 {
+              height: 200px;
+              /*width: 400px;*/
+              padding: 30px;
+              vertical-align: middle;
+              text-align: center;
+              -webkit-font-smoothing: antialiased;
+              border-radius: 10px;
+        }
+        #pilihan1 {
+            background-color: #1BF064;
+        }
+        #pilihan2 {
+            background-position: -460px 0px;
+            background-color: #cc2323;
+        }
+        #pilihan1:hover, #pilihan2:hover {
+          opacity: 0.8;
+        }
+        #green_bar, #red_bar {
+          /*width: 50%;*/
+          height: 30px;
+        }
+        #green_bar {
+          width:20%;
+          background-color: #1BF064;
+          float: left;
+          border-bottom-left-radius: 50px;
+          border-top-left-radius: 50px;
+        }
+        #red_bar {
+          width: 80%;
+          background-color: #cc2323;
+          float:right;
+          border-bottom-right-radius: 50px;
+          border-top-right-radius: 50px;
+        }
+        #poll2 {
+          text-align: right;
+          float:right;
+        }
+        #poll1 {
+          float:left;
+        }
+        #poll1, #poll2 {
+          width: 50%;
+        }
+        .next {
+        }
+        h4 {
+          vertical-align: middle;
+          text-decoration: none;
+          color: #fff;
+          line-height: 30px;
+          padding: 8px 5px 8px 5px;
+          text-shadow: 0.5px 0.5px black;
+          display: block;
+        }
+      </style>
+</head>
+<body background="http://www.powerpointstemplate.com/wp-content/uploads/2017/02/gray-ppt-template-powerpoint-backgrounds.jpg">
+  <input type="hidden" value="{{question[2]}}" id="choice1">  <input type="hidden" value="{{question[3]}}" id="choice2">
+  <nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Choose Wise</a>
+      {% if session.username %}
+      <span style='font-size:24px'><span class="glyphicon glyphicon-star"></span>Welcome, {{ session.username }}</span>
+      {% endif %}
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{url_for('index')}}">HOME</a></li>
+        <li><a href="{{url_for('profile',id=session.id)}}">PROFILE</a></li>
+        <li><a href="{{url_for('create_question')}}">CREATE QUESTION</a></li>
+        <li><a href="{{url_for('logout')}}">LOGOUT</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Setelah vote, ini muncul -->
+
+<div class="container-fluid" id="choice_result" >
+
+  <h1 class="text-center">Your Choice for:</h1>
+  <h1 class="text-center"><b id="result">{{question[1]}}</b></h1>
+  <div class="row">
+    <div class="col-sm-3" >
+    </div>
+    <div class="col-sm-6">
+      <div class="container-fluid">
+        <div id="poll1"></div>
+        <div id="poll2"></div>
+      </div>
+      <div id="bar">
+        <div id="green_bar"></div>
+        <div id="red_bar"></div>
+      </div>
+    </div>
+    <div class="col-sm-3" >
+    </div>
+  </div>
+
+  <br>
+  <div id="summary1" style="display:flex;justify-content:center;align-items:center;"></div>
+  <div id="summary2" style="display:flex;justify-content:center;align-items:center;"></div>
+  <br>
+  <div class="container">
+    <div class="col-sm-5" >
+      </div>
+    <a href="{{url_for('index')}}" class="col-sm-2 btn btn-success next">Next</a>
+    <div class="col-sm-5" >
+      </div>
+  </div>
+</div>
+
+</body>
+
+<script>
+$(document).ready(function(){
+	var green_poll = {{green_chooser}};
+	var red_poll = {{red_chooser}};
+	var total = green_poll + red_poll;
+	var width_green = (green_poll*100/total).toFixed();//skaligus pembulatan
+	var width_red = (100 - width_green).toFixed() ;//skaligus pembulatan
+	$('#green_bar').css('width', width_green + '%');
+	$('#red_bar').css('width', width_red + '%');
+	$("#poll1").text(green_poll + ' Votes (' + width_green + '%)');
+	$("#poll2").text(red_poll + ' Votes (' + width_red + '%)');
+	// ubah var pilihan1 & pilihan2 sesuai database
+	var pilihan1 = "{{question[2]}}";
+	var pilihan2 = "{{question[3]}}";
+	$("#summary1").text(width_green + '% : ' + pilihan1);
+	$("#summary2").text(width_red + '% : ' + pilihan2);
+	$('#choice_result').show();
+});
+</script>
+</html>
